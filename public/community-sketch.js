@@ -12,11 +12,37 @@ const STATES = {
 let GameState = STATES.START;
       
 let ctx;
-let allCorals = [];
+
+const rock1Corals = {
+  rowNum: 6,
+  colNum: 10,
+  totalLimit: 60,
+  startX: window.innerWidth/8,
+  startY: window.innerHeight / 2,
+  allCorals: [],
+};
+
+const rock2Corals = {
+  rowNum: 3,
+  colNum: 15,
+  totalLimit: 45,
+  allCorals: [],
+};
+
+const rock3Corals = {
+  rowNum: 6,
+  colNum: 8,
+  totalLimit: 48, 
+  allCorals: [],
+};
+
 //Image resources:
 let tank;
 let amCoral;
 let fsCoral;
+let alCoral;
+
+
 // MQTT client:
 let client;
 
@@ -25,8 +51,8 @@ const topic = 'IndividualVideoDone';
 
 function preload() {
   tank = loadImage('Assets/tank.png');
+  fsCoral = loadImage('Assets/fs-test.png');
   amCoral = loadImage('Assets/am-test.png');
-  fsCoral = loadImage('Assets/am-test.png');
 
   setupMQTT();
 };
@@ -54,7 +80,8 @@ function setupMQTT(){
   // connect to the MQTT broker:
     client.connect(
         {
-            onSuccess: () => {    
+            onSuccess: () => {
+            console.log("connected");  
               client.subscribe(topic);
             },       // callback function for when you connect
             userName: MQTTCreds.userName,   // username
@@ -66,40 +93,47 @@ function setupMQTT(){
 
 const onMQTTMessageArrive = (message) => {
 
-  // const sampleData = {
-  //         coralType: FUNGIA_SCUTARIA
-  //         name: "Bob",
-  //         red: "255",
-  //         blue: "0",
-  //         green: "255",
-  //         state: "VID-DONE",
-  //         type: STATION_TYPE,
-  //};
-
-  // CORAL_TYPE = {
-  // FUNGIA_SCUTARIA: "FUNGIA_SCUTARIA",
-  // ACROPORA_LORIPES: "ACROPORA_LORIPES",
-  // ACROPORA_MILLEPORA:
-
-  //Coral(coralType, img, name, red, green, blue,){
-
   const actualData = JSON.parse(message.payloadString);
-  if(actualData.state === "VID-DONE"){
-    const [ name, red, blue, green ] = actualData;
-    const coral = message.payloadString;
-    const imgType = coral === CORAL_TYPE.FUNGIA_SCUTARIA ? fsCoral : amCoral;
+  console.log(actualData);
 
-    const newCoral = Coral(
-      coral,
+  if(actualData.state === "VID-DONE"){
+    console.log("Received Data");
+    const coral = actualData.coralType;
+
+    if(actualData.coralType === CORAL_TYPE.FUNGIA_SCUTARIA ){
+      imgType = fsCoral;
+    }
+    else if(actualData.coralType === CORAL_TYPE.ACROPORA_LORIPES ){
+      imgType = alCoral;
+    }
+    else if(actualData.coralType === CORAL_TYPE.ACROPORA_MILLEPORA){
+      imgType = amCoral;
+    }
+    const newCoral = new Coral(
+      actualData.coralType,
       imgType, 
       name,
       red,
       blue,
       green
     );
-    allCorals.push(newCoral);
-  }
 
+    console.log(newCoral);
+
+    if(rock1Corals.allCorals.length < rock1Corals.totalLimit){
+      console.log("Adding Coral to Rock 1");
+      rock1Corals.allCorals.push(newCoral);
+    }
+    else if(rock1Corals.allCorals.length >= rock1Corals.totalLimit && rock2Corals.allCorals.length < rock2Corals.totalLimit){
+      console.log("Adding Coral to Rock 2");
+      rock2Corals.allCorals.push(newCoral);
+    }
+    else if(rock2Corals.allCorals.length >= rock2Corals.totalLimit && rock3Corals.allCorals.length < rock3Corals.totalLimit){
+      console.log("Adding Coral to Rock 3");
+      rock3Corals.allCorals.push(newCoral);
+    }
+
+  }
 }
 
 function setup() {
@@ -107,10 +141,35 @@ function setup() {
 }
 
 function draw() {
-  image(tank, 0, 0, canvas.width, canvas.height);
-  allCorals.forEach((coral)=>{
-    coral.drawSelf();
+  image(tank, 0, 0, window.innerWidth, window.innerHeight);
+  drawRock1Corals();
+  //drawRock2Corals();
+  //drawRock3Corals();
+}
+
+function drawRock1Corals(){
+  rock1Corals.allCorals.forEach((coral, ind)=>{
+    let row = Math.floor(ind / rock1Corals.rowNum);
+    let col = ind % rock1Corals.colNum;
+    coral.drawSelf(row, col, rock1Corals.startX, rock1Corals.startY);
   });
+}
+
+function drawRock2Corals(){
+  rock2Corals.allCorals.forEach((coral, ind)=>{
+    let row = Math.floor(ind / rock2Corals.rowNum);
+    let col = ind % rock2Corals.colNum;
+    coral.drawSelf(row, col, rock2Corals.startX, rock2Corals.startY);
+  });
+}
+
+
+function drawRock3Corals(){
+  rock3Corals.allCorals.forEach((coral, ind)=>{
+    let row = Math.floor(ind / rock3Corals.rowNum);
+    let col = ind % rock3Corals.colNum;
+    coral.drawSelf(row, col, rock3Corals.startX, rock3Corals.startY);
+  })
 }
 
 function keyPressed() {
@@ -129,7 +188,7 @@ function sendMqttMessage() {
         let msg = `${STATION_TYPE}-HI`;
         const finalData = {
           coralType: CORAL_TYPE.FUNGIA_SCUTARIA,
-          name: "Bob",
+          name: "TEST",
           red: "255",
           blue: "0",
           green: "255",
