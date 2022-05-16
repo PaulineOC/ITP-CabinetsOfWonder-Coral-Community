@@ -163,7 +163,6 @@ function drawRock2Corals(){
   });
 }
 
-
 function drawRock3Corals(){
   rock3Corals.allCorals.forEach((coral, ind)=>{
     let row = Math.floor(ind / rock3Corals.rowNum);
@@ -174,8 +173,7 @@ function drawRock3Corals(){
 
 function keyPressed() {
   if (keyCode === UP_ARROW) {
-    console.log("Up pressed (fake switch)");
-    turnOnVideo();
+    console.log("Pressed Up");
   }
   else if(keyCode=== RIGHT_ARROW){
     console.log("Sending p5 -> p5 MQTT Test message");
