@@ -38,7 +38,6 @@ window.addEventListener("keyup", (event) => {
     const randomSpecies = _.sample(Object.values(CORAL_SPECIES));
     const randomColor = _.sample(Object.values(COLORS));
     const randomName = _.shuffle(TEST_NAMES).pop();
-    // const randomName = _.sample(Object.values(TEST_NAMES));
     const toSpawn = {
       species: randomSpecies, 
       color: randomColor,
