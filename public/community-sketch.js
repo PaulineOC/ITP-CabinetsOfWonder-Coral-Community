@@ -14,25 +14,29 @@ let GameState = STATES.START;
 let ctx;
 
 const rock1Corals = {
-  rowNum: 6,
-  colNum: 10,
-  totalLimit: 60,
-  startX: window.innerWidth/8,
-  startY: window.innerHeight / 2,
+  rowNum: 4,
+  colNum: 3,
+  totalLimit: 12,
+  startX: window.innerWidth / 10,
+  startY: window.innerHeight - 550,
   allCorals: [],
 };
 
 const rock2Corals = {
-  rowNum: 3,
-  colNum: 15,
-  totalLimit: 45,
+  rowNum: 5,
+  colNum: 3,
+  totalLimit: 15,
+  startX: window.innerWidth / 2 - 75,
+  startY: window.innerHeight - 775,
   allCorals: [],
 };
 
 const rock3Corals = {
-  rowNum: 6,
-  colNum: 8,
-  totalLimit: 48, 
+  rowNum: 5,
+  colNum: 3,
+  totalLimit: 15, 
+  startX: window.innerWidth / 2 + 150,
+  startY: window.innerHeight - 450,
   allCorals: [],
 };
 
@@ -48,6 +52,8 @@ let client;
 
 // topic to subscribe to when you connect:
 const topic = 'IndividualVideoDone';
+const topic2 = 'ArduinoMessage';
+const topic3 = 'ResetCustomizer';
 
 function preload() {
   tank = loadImage('Assets/tank.png');
@@ -83,6 +89,7 @@ function setupMQTT(){
             onSuccess: () => {
             console.log("connected");  
               client.subscribe(topic);
+              client.subscribe(topic2);
             },       // callback function for when you connect
             userName: MQTTCreds.userName,   // username
             password: MQTTCreds.password,   // password
@@ -98,6 +105,7 @@ const onMQTTMessageArrive = (message) => {
 
   if(actualData.state === "VID-DONE"){
     console.log("Received Data");
+    console.log(actualData);
     const coral = actualData.coralType;
 
     if(actualData.coralType === CORAL_TYPE.FUNGIA_SCUTARIA ){
@@ -118,8 +126,6 @@ const onMQTTMessageArrive = (message) => {
       green
     );
 
-    console.log(newCoral);
-
     if(rock1Corals.allCorals.length < rock1Corals.totalLimit){
       console.log("Adding Coral to Rock 1");
       rock1Corals.allCorals.push(newCoral);
@@ -132,54 +138,103 @@ const onMQTTMessageArrive = (message) => {
       console.log("Adding Coral to Rock 3");
       rock3Corals.allCorals.push(newCoral);
     }
-
+    resetCustomizerMessage();
   }
 }
 
 function setup() {
   ctx = createCanvas(window.innerWidth, window.innerHeight);
+    image(tank, 0, 0, window.innerWidth, window.innerHeight);
 }
 
 function draw() {
-  image(tank, 0, 0, window.innerWidth, window.innerHeight);
-  drawRock1Corals();
-  //drawRock2Corals();
-  //drawRock3Corals();
+  if(rock1Corals.allCorals.length > 0 ){
+      drawRock1Corals();
+  }
+  if(rock2Corals.allCorals.length > 0 ){
+      drawRock2Corals();
+  }
+  if(rock3Corals.allCorals.length > 0 ){
+      drawRock3Corals();
+  }
 }
 
 function drawRock1Corals(){
-  rock1Corals.allCorals.forEach((coral, ind)=>{
-    let row = Math.floor(ind / rock1Corals.rowNum);
-    let col = ind % rock1Corals.colNum;
-    coral.drawSelf(row, col, rock1Corals.startX, rock1Corals.startY);
-  });
+  for(let i = 0; i< rock1Corals.rowNum; i++){
+    for(let j = 0; j< rock1Corals.colNum; j++){
+      let ind = `${j * rock1Corals.rowNum + i}`; 
+      let currCoral = rock1Corals.allCorals[ind];
+      if(currCoral){
+        currCoral.drawSelf(i, j, rock1Corals.startX, rock1Corals.startY);
+      }
+    }
+  }
 }
 
 function drawRock2Corals(){
-  rock2Corals.allCorals.forEach((coral, ind)=>{
-    let row = Math.floor(ind / rock2Corals.rowNum);
-    let col = ind % rock2Corals.colNum;
-    coral.drawSelf(row, col, rock2Corals.startX, rock2Corals.startY);
-  });
+  for(let i = 0; i< rock2Corals.rowNum; i++){
+    for(let j = 0; j< rock2Corals.colNum; j++){
+      let ind = `${j * rock2Corals.rowNum + i}`; 
+      let currCoral = rock2Corals.allCorals[ind];
+      if(currCoral){
+        currCoral.drawSelf(i, j, rock2Corals.startX, rock2Corals.startY);
+      }
+    }
+  }
 }
 
 function drawRock3Corals(){
-  rock3Corals.allCorals.forEach((coral, ind)=>{
-    let row = Math.floor(ind / rock3Corals.rowNum);
-    let col = ind % rock3Corals.colNum;
-    coral.drawSelf(row, col, rock3Corals.startX, rock3Corals.startY);
-  })
+  for(let i = 0; i< rock3Corals.rowNum; i++){
+    for(let j = 0; j< rock3Corals.colNum; j++){
+      let ind = `${j * rock3Corals.rowNum + i}`; 
+      let currCoral = rock3Corals.allCorals[ind];
+      if(currCoral){
+        currCoral.drawSelf(i, j, rock3Corals.startX, rock3Corals.startY);
+      }
+    }
+  }
 }
 
 function keyPressed() {
   if (keyCode === UP_ARROW) {
     console.log("Pressed Up");
   }
-  else if(keyCode=== RIGHT_ARROW){
-    console.log("Sending p5 -> p5 MQTT Test message");
+  else if(keyCode=== DOWN_ARROW){
+    console.log("Making fake coral: Individual p5 --> Community p5");
     sendMqttMessage();
   }
+  else if(keyCode === LEFT_ARROW){
+    console.log("Sending fake arduino structural:");
+    sendFakeArduinoSignal(1);
+  }
+  else if(keyCode === RIGHT_ARROW){
+    console.log("Sending fake Arduino physical:");
+    sendFakeArduinoSignal(2);
+  }
 }
+
+function sendFakeArduinoSignal(num){
+  if (client.isConnected()) {
+        let msg = `${num}`;
+        // start an MQTT message:
+        message = new Paho.MQTT.Message(msg);
+        message.destinationName = topic2;
+        // send it:
+        client.send(message);
+    }
+}
+
+function resetCustomizerMessage(){
+  if (client.isConnected()) {
+        let msg = 'RESET';
+        // start an MQTT message:
+        message = new Paho.MQTT.Message(msg);
+        message.destinationName = topic3;
+        // send it:
+        client.send(message);
+    }
+}
+
 
 function sendMqttMessage() {
     if (client.isConnected()) {

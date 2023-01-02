@@ -11,8 +11,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const socketIO = require("socket.io");
 
-const server = app.listen(3001, () => {
-	console.log("listening on port 3001!");
+const server = app.listen(3002, () => {
+	console.log("Community - listening on port 3002!");
 });
 
 const io = socketIO(server);

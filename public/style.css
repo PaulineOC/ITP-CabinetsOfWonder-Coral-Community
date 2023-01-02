@@ -1,21 +1,116 @@
 html, body {
   margin: 0;
   padding: 0;
+  overflow:hidden;
 }
+
+body{
+ 
+}
+
 canvas {
   display: block;
 }
 
+#mainContainer{
+  box-sizing:border-box;
+  background: url("Assets/ocean-v3.png") no-repeat fixed center;
+  background-position: initial;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 
-.hidden{
-  display: none;
+.rock{
+  position: absolute;
 }
 
 
-.instructionalVideos{
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  min-width: 100% !important;
-  min-height: 100% !important;
+/* CORALS  */
+
+.box{
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.5);
 }
+
+.nameTest{
+  position: absolute;
+/*  visibility: hidden;*/
+  height: auto;
+  width: auto;
+  white-space: nowrap;
+}
+
+.coralName{
+  position: absolute;
+  height: auto;
+  width: auto;
+  white-space: nowrap;
+}
+
+.RED{
+  filter: invert(0%) sepia(10%) saturate(6177%) hue-rotate(315deg);
+}
+.ORANGE{
+  filter: invert(0%) sepia(10%) saturate(6177%) hue-rotate(0deg);
+}
+.YELLOW{
+  filter: invert(0%) sepia(10%) saturate(6177%) hue-rotate(15deg);
+}
+.GREEN{
+  filter: invert(0%) sepia(10%) saturate(6177%) hue-rotate(90deg);
+}
+.CYAN{
+  filter: invert(0%) sepia(10%) saturate(6177%) hue-rotate(135deg);
+
+}
+.BLUE{
+  filter: invert(0%) sepia(10%) saturate(6177%) hue-rotate(180deg);
+
+}
+.PURPLE{
+  filter: invert(0%) sepia(10%) saturate(6177%) hue-rotate(215deg);
+}
+.PINK{
+  filter: invert(0%) sepia(10%) saturate(6177%) hue-rotate(235deg);
+}
+
+
+.growingLonger {
+  animation: scaleCoral 1.75s;
+}
+
+.growingShorter {
+  animation: scaleCoral 1.25s;
+}
+
+@keyframes scaleCoral {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+
+/*
+#rockLeft{
+  height: 50vh;
+  position: absolute;
+  bottom: 1vh;
+  left: 15vw;
+}
+
+#rockBack{
+  height: 55vh;
+  position: absolute;
+  bottom: 1vh;
+  left: 15vw;
+}
+
+#rockRight{
+  height:  50vh;
+  position: absolute;
+  bottom: 1vh;
+  left: 45vw;
+}*/
