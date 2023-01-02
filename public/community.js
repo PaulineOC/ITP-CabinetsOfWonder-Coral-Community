@@ -27,20 +27,17 @@ window.addEventListener("keyup", (event) => {
     console.log('Resetting background');
     resetBackground();
   }
-
   //ESC
   if(event.keyCode === 27 && preventTimeoutTimer){
     console.log('Aborting prevent timeout');
     clearInterval(preventTimeoutTimer);
   }
-
   //Space
   if (event.keyCode === 32) {
     console.log('Generating Random Coral');
     const randomSpecies = _.sample(Object.values(CORAL_SPECIES));
     const randomColor = _.sample(Object.values(COLORS));
     const randomName = _.sample(Object.values(TEST_NAMES));
-
     const toSpawn = {
       species: randomSpecies, 
       color: randomColor,
@@ -51,7 +48,6 @@ window.addEventListener("keyup", (event) => {
       console.log('MQTT disconnected: manually adding');
       userCorals.push(new Coral(toSpawn.species, toSpawn.color, toSpawn.name));
     }
-
   }
 
   if(event.keyCode === 13){
